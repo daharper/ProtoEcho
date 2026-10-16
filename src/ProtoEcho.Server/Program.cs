@@ -13,7 +13,10 @@ builder.Services
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = true,
-            ValidAudience = "protoecho"
+            ValidAudience = "protoecho",
+            
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
         };
     });
     

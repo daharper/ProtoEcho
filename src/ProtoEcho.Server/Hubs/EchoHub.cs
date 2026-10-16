@@ -8,4 +8,10 @@ public sealed class EchoHub : Hub
     {
         await Clients.Caller.SendAsync("AgentEcho", message);
     }
+    
+    public string WhoAmI()
+    {
+        return $"Authenticated: {Context.User?.Identity?.IsAuthenticated}, " +
+               $"Client: {Context.User?.FindFirst("azp")?.Value}";
+    }
 }
