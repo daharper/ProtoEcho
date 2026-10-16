@@ -1,0 +1,127 @@
+# ============================================================
+# .gitignore for ASP.NET Core / C# Solution
+# ============================================================
+
+# ------ Build output ------
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# ------ .NET ------
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet packages
+*.nupkg
+*.snupkg
+**/[Pp]ackages/
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+nuget.config
+
+# MSBuild
+*.msbuildcache
+
+# ------ ASP.NET Core ------
+**/wwwroot/lib/
+**/BundlerMinifier.Core/
+
+# Published output
+**/publish/
+**/PublishProfiles/
+
+# ------ Visual Studio ------
+.vs/
+*.rsuser
+*.vsp
+*.vspx
+*.sap
+
+# Visual Studio code metrics
+*.psess
+*.vsp
+
+# Visual Studio Razor editor
+*.VisualState.xml
+
+# Hot reload
+**/.hotreload/
+
+# ------ Rider / JetBrains ------
+# (keep .idea/ tracked if sharing run configs, or uncomment to ignore)
+# .idea/
+
+# ------ User-specific files ------
+*.user
+*.dbmdl
+*.jfm
+
+# ------ Test Results ------
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.tte
+TestResult.xml
+[Tt]est*.xml
+*.trx
+coverage*.json
+coverage*.xml
+coverage*.info
+*.coverage
+*.coveragexml
+
+# ------ dotnet tools ------
+.dotnet/
+tools/.store/
+
+# ------ Docker ------
+**/docker-compose.override.yml
+
+# ------ OS generated ------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ------ Environment & secrets ------
+.env
+.env.*
+!.env.example
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/secrets.json
+**/*.pfx
+**/*.p12
+**/*.key
+
+# ------ Certificates ------
+*.cer
+*.crt
+*.pem
+
+# ------ Logs ------
+*.log
+*.log.*
