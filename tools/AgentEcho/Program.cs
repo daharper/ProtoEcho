@@ -1,8 +1,10 @@
-﻿using System.Net.Http.Json;
-using System.Text.Json.Serialization;
+﻿using AgentEcho;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
+
+const string tokenEndpoint = "http://localhost:8180/realms/protoecho/protocol/openid-connect/token";
+const string echoHub = "http://localhost:5000/hubs/echo";
 
 var configuration = new ConfigurationBuilder()
 	.AddUserSecrets<Program>()
@@ -16,30 +18,21 @@ var clientSecret = configuration["Keycloak:ClientSecret"]
 
 using var httpClient = new HttpClient();
 
-const string tokenEndpoint = "http://localhost:8180/realms/protoecho/protocol/openid-connect/token";
-
-using var response = await httpClient.PostAsync(tokenEndpoint, new FormUrlEncodedContent([
-	new KeyValuePair<string, string>("grant_type", "client_credentials"),
-	new KeyValuePair<string, string>("client_id", clientId),
-	new KeyValuePair<string, string>("client_secret", clientSecret)
-]));
-
-response.EnsureSuccessStatusCode();
-
-var token = await response.Content.ReadFromJsonAsync<TokenResponse>()
-	?? throw new InvalidOperationException("Empty token response.");
-
-Console.WriteLine($"Access token obtained. Expires in {token.ExpiresIn} seconds.	");
+var tokenProvider = new KeycloakTokenProvider(
+	httpClient,
+	tokenEndpoint, 
+	clientId,
+	clientSecret);
 
 await using var connection = new HubConnectionBuilder()
-	.WithUrl("http://localhost:5000/hubs/echo", options =>
+	.WithUrl(echoHub, options =>
 	{
 		options.Transports = HttpTransportType.WebSockets;
-		options.AccessTokenProvider = () => Task.FromResult<string?>(token.AccessToken);
+		options.AccessTokenProvider = () => tokenProvider.GetAccessTokenAsync();
 	})
 	.Build();
 
-connection.On<string>("AgentEcho", m => { Console.WriteLine($"Recieved: {m}"); });
+connection.On<string>("AgentEcho", m => { Console.WriteLine($"Received: {m}"); });
 
 await connection.StartAsync();
 
@@ -63,7 +56,7 @@ while (await timer.WaitForNextTickAsync())
 
 		await connection.StopAsync();
 
-		Console.WriteLine("Reconnecting with original token...");
+		Console.WriteLine("Reconnecting with token provider...");
 
 		try
 		{
@@ -99,9 +92,3 @@ while (await timer.WaitForNextTickAsync())
 
 //Console.ReadLine();
 
-public sealed record TokenResponse(
-	[property: JsonPropertyName("access_token")]
-	string AccessToken,
-	[property: JsonPropertyName("expires_in")]
-	int ExpiresIn
-);
