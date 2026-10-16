@@ -30,7 +30,29 @@ await using var connection = new HubConnectionBuilder()
 		options.Transports = HttpTransportType.WebSockets;
 		options.AccessTokenProvider = () => tokenProvider.GetAccessTokenAsync();
 	})
+	.WithAutomaticReconnect()
 	.Build();
+
+connection.Reconnecting += error =>
+{
+	Console.WriteLine($"Reconnection: {error?.GetType().Name}: {error?.Message}");
+	
+	return Task.CompletedTask;
+};
+
+connection.Reconnected += connectionId =>
+{
+	Console.WriteLine($"Reconnected automatically, ConnectionId: {connectionId}");
+	
+	return Task.CompletedTask;
+};
+
+connection.Closed += error =>
+{
+	Console.WriteLine($"Connection closed: {error?.GetType().Name}: {error?.Message}");
+
+	return Task.CompletedTask;
+};
 
 connection.On<string>("AgentEcho", m => { Console.WriteLine($"Received: {m}"); });
 
@@ -73,7 +95,7 @@ while (await timer.WaitForNextTickAsync())
 			Console.WriteLine(
 				$"Reconnection failed: {ex.GetType().Name}: {ex.Message}");
 
-			break;
+			continue;
 		}
 	}
 	
@@ -86,7 +108,6 @@ while (await timer.WaitForNextTickAsync())
 	catch (Exception e)
 	{
 		Console.WriteLine($"Send failed: {e.GetType().Name}: {e.Message}");
-		break;
 	}
 }
 
