@@ -1,75 +1,141 @@
-# React + TypeScript + Vite
+# ProtoEcho.Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React and TypeScript web client for the **ProtoEcho** ASP.NET Core SignalR application.
 
-Currently, two official plugins are available:
+This project demonstrates authenticated, real-time communication between a browser and an ASP.NET Core backend using **Keycloak**, **OpenID Connect**, and **SignalR**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+It is part of the larger ProtoEcho solution, which currently includes a .NET console client (`AgentEcho`).
 
-## React Compiler
+## Technology Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React** — user interface and component state
+- **TypeScript** — type-safe application code
+- **Vite** — development server and build tooling
+- **Bootstrap 5** — responsive layout, components, and dark theme
+- **ASP.NET Core SignalR JavaScript client** — real-time server communication
+- **Keycloak JS adapter** — OpenID Connect authentication using Authorization Code Flow with PKCE
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Interactive login through Keycloak
+- Authentication using a public OIDC client with PKCE (S256)
+- Access-token renewal before SignalR connection attempts
+- Authenticated SignalR communication over WebSockets
+- Automatic SignalR reconnection
+- Editable message input
+- Echo responses displayed using React state
+- Bootstrap 5 dark-themed interface
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Architecture
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```text
+Browser
+  |
+  | OIDC Authorization Code Flow + PKCE
+  v
+Keycloak (localhost:8180)
+  |
+  | Access token
+  v
+React / TypeScript
+  |
+  | Authenticated SignalR connection
+  | WebSocket
+  v
+ProtoEcho.Server (localhost:5000)
+  |
+  | EchoHub.Echo(message)
+  |
+  | AgentEcho event
+  v
+React state update
+  |
+  v
+Browser UI
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+The browser authenticates with Keycloak and receives an access token. The SignalR client supplies this token when establishing its connection to the ASP.NET Core backend.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The backend validates the token's issuer, audience, signature and lifetime before allowing access to the SignalR hub.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Prerequisites
 
+- Node.js and npm
+- A running `ProtoEcho.Server` instance
+- A running Keycloak instance with the `protoecho` realm configured
+- A Keycloak user permitted to sign in to the web client
+
+### Local development endpoints
+
+| Service | URL |
+|---|---|
+| React / Vite | `http://localhost:5173` |
+| ProtoEcho.Server | `http://localhost:5000` |
+| SignalR hub | `http://localhost:5000/hubs/echo` |
+| Keycloak | `http://localhost:8180` |
+| Keycloak realm | `protoecho` |
+
+These URLs are currently configured for local development.
+
+## Keycloak Configuration
+
+The React application uses the following OIDC client:
+
+| Setting | Value |
+|---|---|
+| Client ID | `protoecho-web` |
+| Client authentication | Off (public client) |
+| Standard flow | Enabled |
+| PKCE method | S256 |
+| Valid redirect URIs | `http://localhost:5173/*` |
+| Web origins | `http://localhost:5173` |
+
+The client must also have an **Audience** protocol mapper configured:
+
+- **Included Custom Audience:** `protoecho`
+- **Add to access token:** Enabled
+
+This ensures the access token contains the audience expected by `ProtoEcho.Server`.
+
+The browser client does **not** use a client secret.
+
+## Running Locally
+
+Start Keycloak and `ProtoEcho.Server` first.
+
+From the `tools/ProtoEcho.Web` directory, install dependencies:
+
+```bash
+npm install
 ```
+
+Start the Vite development server:
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:5173
+```
+
+You will be redirected to Keycloak to sign in.
+
+After authentication, the application establishes an authenticated SignalR connection.
+
+Enter a message and select **Send Echo**. The server's response will appear in the interface.
+
+## Project Structure
+
+```text
+src/
+├── App.tsx        # React UI and echo interaction
+├── keycloak.ts    # Keycloak client configuration
+├── signalr.ts     # SignalR connection configuration
+├── main.tsx       # Authentication and application startup
+└── index.css      # Application-specific CSS
+```
+
+## Authentication and Signal
