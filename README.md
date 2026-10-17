@@ -1,6 +1,6 @@
 # ProtoEcho
 
-**A simple exploration of ASP.NET Core SignalR, Keycloak authentication, and real-time communication with .NET and React clients.**
+**A simple exploration of ASP.NET Core SignalR, Keycloak, and real-time communication with .NET and React clients.**
 
 The objective was to explore SignalR as a potential messaging server, and to see how it behaves across different client technologies and authentication flows, including connection establishment, access-token management, message exchange, disconnection, and reconnection.
 
