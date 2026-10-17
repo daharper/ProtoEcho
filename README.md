@@ -2,9 +2,7 @@
 
 **A simple exploration of ASP.NET Core SignalR, Keycloak authentication, and real-time communication with .NET and React clients.**
 
-ProtoEcho is a small experimental solution built to investigate authenticated, bidirectional communication using ASP.NET Core SignalR.
-
-The objective was explore SignalR as a potential messaging server, and to see how it behaves across different client technologies and authentication flows, including connection establishment, access-token management, message exchange, disconnection, and reconnection.
+The objective was to explore SignalR as a potential messaging server, and to see how it behaves across different client technologies and authentication flows, including connection establishment, access-token management, message exchange, disconnection, and reconnection.
 
 The solution consists of a shared ASP.NET Core backend and two clients: a C# console application and a React/TypeScript web application.
 
