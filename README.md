@@ -4,7 +4,7 @@
 
 The objective was to explore SignalR as a potential messaging server, and to see how it behaves across different client technologies and authentication flows, including connection establishment, access-token management, message exchange, disconnection, and reconnection.
 
-The solution consists of a shared ASP.NET Core backend and two clients: a C# console application and a React/TypeScript web application.
+The solution consists of a shared ASP.NET Core backend and two very simple clients: a C# console application and a React/TypeScript web application.
 
 ## Objectives
 
