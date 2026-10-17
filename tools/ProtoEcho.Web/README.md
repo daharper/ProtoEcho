@@ -4,7 +4,7 @@ A React and TypeScript web client for the **ProtoEcho** ASP.NET Core SignalR app
 
 This project demonstrates authenticated, real-time communication between a browser and an ASP.NET Core backend using **Keycloak**, **OpenID Connect**, and **SignalR**.
 
-It is part of the larger ProtoEcho solution, which currently includes a .NET console client (`AgentEcho`).
+It is part of the larger ProtoEcho solution, which also includes a .NET console client (`AgentEcho`).
 
 ## Technology Stack
 
@@ -138,4 +138,35 @@ src/
 └── index.css      # Application-specific CSS
 ```
 
-## Authentication and Signal
+## Authentication and SignalR
+
+Authentication is initialized before the React application is rendered.
+
+The SignalR connection uses an `accessTokenFactory` that calls `keycloak.updateToken(30)` to refresh the access token when necessary.
+
+The server accepts bearer tokens from the `access_token` query parameter for the SignalR hub endpoint. This is required because browser WebSocket APIs cannot set arbitrary HTTP authorization headers.
+
+**Security considerations:**
+
+- Use HTTPS/WSS outside local development.
+- Never store a client secret in browser code.
+- Avoid logging access tokens or token-bearing URLs.
+- Restrict query-string token handling to the SignalR endpoint.
+- Do not commit credentials or access tokens to source control.
+
+## Development Commands
+
+```bash
+npm run dev       # Start development server
+npm run build     # Type-check and build for production
+npm run lint      # Run ESLint
+npm run preview   # Preview the production build locally
+```
+
+## Current Scope
+
+ProtoEcho.Web is a development and learning application rather than a production-ready frontend.
+
+Its current purpose is to demonstrate the integration of React, TypeScript, Keycloak authentication and ASP.NET Core SignalR through a small end-to-end echo workflow.
+
+The broader ProtoEcho solution also contains `AgentEcho`, a .NET console client that authenticates using OAuth 2.0 client credentials, providing a useful contrast with the browser's interactive OIDC authentication flow.
