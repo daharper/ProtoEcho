@@ -1,6 +1,6 @@
 # ProtoEcho
 
-**Exploring ASP.NET Core SignalR, Keycloak authentication, and real-time communication across .NET and React clients.**
+**A simple exploration of ASP.NET Core SignalR, Keycloak authentication, and real-time communication with .NET and React clients.**
 
 ProtoEcho is a small experimental solution built to investigate authenticated, bidirectional communication using ASP.NET Core SignalR.
 
